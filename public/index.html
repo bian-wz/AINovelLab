@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI小说工具 (AINovelLab)</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header class="py-4 text-center">
+            <h1 class="mb-3">AI小说工具 (AINovelLab)</h1>
+            <p class="lead">智能化的小说内容处理工具套件</p>
+        </header>
+
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <ul class="nav nav-tabs card-header-tabs" id="myTab" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="epub-split-tab" data-bs-toggle="tab" data-bs-target="#epub-split" type="button" role="tab" aria-controls="epub-split" aria-selected="true">EPUB分割器</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="novel-condenser-tab" data-bs-toggle="tab" data-bs-target="#novel-condenser" type="button" role="tab" aria-controls="novel-condenser" aria-selected="false">小说脱水工具</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="txt-to-epub-tab" data-bs-toggle="tab" data-bs-target="#txt-to-epub" type="button" role="tab" aria-controls="txt-to-epub" aria-selected="false">TXT合并转EPUB</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="api-config-tab" data-bs-toggle="tab" data-bs-target="#api-config" type="button" role="tab" aria-controls="api-config" aria-selected="false">API配置</button>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="card-body">
+                        <div class="tab-content" id="myTabContent">
+                            <!-- EPUB分割器 -->
+                            <div class="tab-pane fade show active" id="epub-split" role="tabpanel" aria-labelledby="epub-split-tab">
+                                <h3 class="card-title">EPUB分割器</h3>
+                                <p class="card-text">将EPUB电子书分割为单章TXT文件</p>
+                                
+                                <form id="epub-split-form" class="mb-4">
+                                    <div class="mb-3">
+                                        <label for="epub-file" class="form-label">上传EPUB文件</label>
+                                        <input class="form-control" type="file" id="epub-file" accept=".epub" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="split-pattern" class="form-label">分割规则（正则表达式）</label>
+                                        <input type="text" class="form-control" id="split-pattern" placeholder="例如: 第[0-9一二三四五六七八九十百千]+章" value="第[0-9一二三四五六七八九十百千]+章">
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">开始分割</button>
+                                </form>
+                                
+                                <div class="progress mb-3 d-none" id="epub-split-progress-container">
+                                    <div class="progress-bar" role="progressbar" id="epub-split-progress" style="width: 0%"></div>
+                                </div>
+                                
+                                <div id="epub-split-result" class="d-none">
+                                    <h4>处理结果</h4>
+                                    <div class="alert alert-success">
+                                        <p>EPUB分割完成！</p>
+                                        <a href="#" class="btn btn-success" id="epub-split-download">下载分割后的文件</a>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- 小说脱水工具 -->
+                            <div class="tab-pane fade" id="novel-condenser" role="tabpanel" aria-labelledby="novel-condenser-tab">
+                                <h3 class="card-title">小说脱水工具</h3>
+                                <p class="card-text">使用AI自动将小说内容缩减至原文的30%-50%</p>
+                                
+                                <form id="novel-condenser-form" class="mb-4">
+                                    <div class="mb-3">
+                                        <label for="txt-files" class="form-label">上传TXT文件</label>
+                                        <input class="form-control" type="file" id="txt-files" accept=".txt" multiple required>
+                                        <div class="form-text">可以选择多个TXT文件进行批量处理</div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="compression-ratio" class="form-label">压缩比例: <span id="compression-ratio-value">40%</span></label>
+                                        <input type="range" class="form-range" id="compression-ratio" min="30" max="50" value="40">
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">开始脱水</button>
+                                </form>
+                                
+                                <div class="progress mb-3 d-none" id="novel-condenser-progress-container">
+                                    <div class="progress-bar" role="progressbar" id="novel-condenser-progress" style="width: 0%"></div>
+                                </div>
+                                
+                                <div id="novel-condenser-result" class="d-none">
+                                    <h4>处理结果</h4>
+                                    <div class="alert alert-success">
+                                        <p>小说脱水完成！</p>
+                                        <a href="#" class="btn btn-success" id="novel-condenser-download">下载脱水后的文件</a>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- TXT合并转EPUB -->
+                            <div class="tab-pane fade" id="txt-to-epub" role="tabpanel" aria-labelledby="txt-to-epub-tab">
+                                <h3 class="card-title">TXT合并转EPUB</h3>
+                                <p class="card-text">将TXT文件合并为EPUB电子书</p>
+                                
+                                <form id="txt-to-epub-form" class="mb-4">
+                                    <div class="mb-3">
+                                        <label for="txt-files-merge" class="form-label">上传TXT文件</label>
+                                        <input class="form-control" type="file" id="txt-files-merge" accept=".txt" multiple required>
+                                        <div class="form-text">可以选择多个TXT文件进行合并，文件名格式应为：小说名_[序号]_章节名.txt</div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="book-title" class="form-label">电子书标题</label>
+                                        <input type="text" class="form-control" id="book-title" placeholder="输入电子书标题">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="book-author" class="form-label">作者</label>
+                                        <input type="text" class="form-control" id="book-author" placeholder="输入作者名">
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">开始转换</button>
+                                </form>
+                                
+                                <div class="progress mb-3 d-none" id="txt-to-epub-progress-container">
+                                    <div class="progress-bar" role="progressbar" id="txt-to-epub-progress" style="width: 0%"></div>
+                                </div>
+                                
+                                <div id="txt-to-epub-result" class="d-none">
+                                    <h4>处理结果</h4>
+                                    <div class="alert alert-success">
+                                        <p>EPUB转换完成！</p>
+                                        <a href="#" class="btn btn-success" id="txt-to-epub-download">下载EPUB文件</a>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- API配置 -->
+                            <div class="tab-pane fade" id="api-config" role="tabpanel" aria-labelledby="api-config-tab">
+                                <h3 class="card-title">API配置</h3>
+                                <p class="card-text">配置AI服务API</p>
+                                
+                                <div class="alert alert-info">
+                                    <p>本网页版使用环境变量配置API，无需在此页面设置。</p>
+                                    <p>支持Gemini和任何符合OpenAI API规范的API，如DeepSeek等。</p>
+                                </div>
+                                
+                                <div class="card mb-3">
+                                    <div class="card-header">API状态</div>
+                                    <div class="card-body">
+                                        <div id="api-status">
+                                            <p>正在检查API配置状态...</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">任务列表</div>
+                    <div class="card-body">
+                        <div id="task-list">
+                            <p>暂无任务</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer class="py-3 text-center">
+            <p>AI小说工具 (AINovelLab) - 网页版</p>
+            <p><a href="https://github.com/wb-hwang/AINovelLab" target="_blank">GitHub 项目</a></p>
+        </footer>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
