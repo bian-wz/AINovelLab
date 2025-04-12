@@ -1,0 +1,49 @@
+# Cloudflare Pages 配置文件
+
+name = "ainovellab"
+compatibility_date = "2023-10-30"
+
+# 构建配置
+[build]
+command = ""  # 不需要构建命令，直接使用静态文件
+publish = "public"  # 发布目录
+
+# 环境变量配置
+[env]
+  # 这里定义默认环境变量，实际值会在Cloudflare Dashboard中设置
+
+# KV 命名空间配置
+[[kv_namespaces]]
+binding = "AINOVELLAB_FILES"  # 用于存储上传和处理后的文件
+preview_id = ""  # 在Cloudflare Dashboard中设置
+production_id = ""  # 在Cloudflare Dashboard中设置
+
+[[kv_namespaces]]
+binding = "AINOVELLAB_TASKS"  # 用于存储任务信息
+preview_id = ""  # 在Cloudflare Dashboard中设置
+production_id = ""  # 在Cloudflare Dashboard中设置
+
+# 路由配置
+[routes]
+include = ["/*"]
+exclude = []
+
+# 函数配置
+[functions]
+directory = "functions"
+
+# 环境变量说明
+[env.production]
+  # API 密钥配置 (实际值在Cloudflare Dashboard中设置)
+  # GEMINI_API_KEYS = "key1,key2,..."  # 多个密钥用逗号分隔
+  # GEMINI_API_MODELS = "gemini-2.0-flash,gemini-2.0-pro,..."  # 对应的模型
+  # GEMINI_API_RPMS = "5,5,..."  # 对应的每分钟请求数限制
+  
+  # OPENAI_API_KEYS = "key1,key2,..."  # 多个密钥用逗号分隔
+  # OPENAI_API_MODELS = "gpt-3.5-turbo,gpt-4,..."  # 对应的模型
+  # OPENAI_API_RPMS = "3,2,..."  # 对应的每分钟请求数限制
+  
+  # MAX_RPM = "20"  # 总体每分钟请求数限制
+
+[env.preview]
+  # 与生产环境相同的配置，但可以使用不同的值进行测试
